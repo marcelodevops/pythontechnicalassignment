@@ -16,6 +16,7 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
 APP_VERSION = "1.0"
 APP_DESCRIPTION = "marcelo's merck technical test."
 
+
 # get last commit sha to show it in the healthcheck endpoint
 def get_last_commit_sha():
     """Get the last commit SHA from Git or environment variable."""
@@ -29,11 +30,13 @@ def get_last_commit_sha():
     except Exception as e:
         return str(e)
 
+
 # basic authentication form
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
 
 # main endpoint to dsplay form and authenticate
 @app.route('/', methods=['GET', 'POST'])
@@ -44,6 +47,7 @@ def login():
         return redirect(url_for('login'))
 
     return render_template('login.html', form=form)
+
 
 # healthcheck endpoint
 @app.route('/healthcheck', methods=['GET'])
