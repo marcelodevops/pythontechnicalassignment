@@ -1,0 +1,175 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          venv/bin/pip install -r requirements.txt
+          venv/bin/pip install pytest flake8 bandit safety
+          pip install --upgrade jinja2
+
+      - name: Run Unit Tests
+        run: |
+          venv/bin/python -m pytest
+
+      - name: Lint Test with Flake8
+        run: |
+          venv/bin/python -m flake8 . --exclude=venv
+
+     # Security Check - Static Code Analysis  
+      - name: Run Bandit Security Check
+        run: |
+          source venv/bin/activate
+          bandit -r . --exclude venv || true
+      
+      # Security Check - Dependency Vulnerability Scanning (ignore jinja vuln)
+      - name: Run Safety Check for Vulnerabilities
+        run: |
+          source venv/bin/activate
+          safety check --ignore=70612 
+
+  build_and_push_docker_image:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set environment variables based on branch
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ECR_REPOSITORY=${{ secrets.ECR_REPOSITORY_PROD }}" >> $GITHUB_ENV
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+          else
+            echo "ECR_REPOSITORY=${{ secrets.ECR_REPOSITORY_DEV }}" >> $GITHUB_ENV
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+
+      - name: Set IMAGE_TAG to latest
+        run: echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+
+      - name: Build and tag Docker image
+        run: |
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest .
+    
+      # Security Check - Container Vulnerability Scan
+      - name: Run Trivy Image Scan
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest \
+          image --severity HIGH,CRITICAL ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest
+          echo "image=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest" >> "$GITHUB_OUTPUT"
+
+  deploy-infrastructure:
+    needs: build_and_push_docker_image
+    name: Deploy infrastructure
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      env-name: ${{ steps.env-name.outputs.environment }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # The "environment name" is used as the base for CloudFormation stack names,
+    # and is derived from the GitHub repository name.
+    # For example, the repo 'Octocat/Hello-World' would have the environment name
+    # 'Octocat-Hello-World' and would deploy a stack name 'Octocat-Hello-World-ecr-repo'.
+    - name: Configure environment name
+      id: env-name
+      env:
+        REPO: ${{ github.repository }}
+      run: |
+        ENVIRONMENT=`echo $REPO | tr "/" "-"`
+        echo "Environment name: $ENVIRONMENT"
+        echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+
+    - name: Configure AWS credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cloudformation-deploy-role
+        role-session-name: DeployInfra
+        aws-region: us-east-2
+
+    - name: Retrieve default VPC ID and public subnets
+      id: vpc
+      run: |
+        VPC_ID=`aws ec2 describe-vpcs --filters "Name=isDefault, Values=true" --query 'Vpcs[].VpcId' --output text`
+        echo "vpc-id=$VPC_ID" >> "$GITHUB_OUTPUT"
+
+        SUBNET_1=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=default-for-az,Values=true" --query 'Subnets[0].SubnetId' --output text`
+        echo "subnet-one=$SUBNET_1" >> "$GITHUB_OUTPUT"
+
+        SUBNET_2=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=default-for-az,Values=true" --query 'Subnets[1].SubnetId' --output text`
+        echo "subnet-two=$SUBNET_2" >> "$GITHUB_OUTPUT"
+
+    - name: Deploy infrastructure with CloudFormation
+      id: infrastructure-stack
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: ${{ steps.env-name.outputs.environment }}-infra
+        template: cloudformation-templates/infrastructure.yaml
+        role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
+        no-fail-on-empty-changeset: "1"
+        parameter-overrides: >-
+          EnvironmentName=${{ steps.env-name.outputs.environment }},
+          VPC=${{ steps.vpc.outputs.vpc-id }},
+          PublicSubnetOne=${{ steps.vpc.outputs.subnet-one }},
+          PublicSubnetTwo=${{ steps.vpc.outputs.subnet-two }}
+    - name: Deploy ECS service with CloudFormation
+      id: service-stack
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: ${{ needs.deploy-infrastructure.outputs.env-name }}-webapp
+        template: cloudformation-templates/service.yaml
+        role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
+        parameter-overrides: >-
+          EnvironmentName=${{ needs.deploy-infrastructure.outputs.env-name }},
+          ServiceName=webapp,
+          ImageUrl=${{ needs.build_and_push_docker_image.outputs.image }}
+
+    - name: Print service URL
+      env:
+        URL: ${{ steps.service-stack.outputs.ServiceURL }}
+      run: |
+        echo "Service URL: $URL"
