@@ -34,9 +34,9 @@ jobs:
         run: |
           venv/bin/python -m pytest
 
-      # - name: Lint Test with Flake8
-      #   run: |
-      #     venv/bin/python -m flake8 . --exclude=venv
+      - name: Lint Test with Flake8
+        run: |
+          venv/bin/python -m flake8 . --exclude=venv
 
      # Security Check - Static Code Analysis  
       - name: Run Bandit Security Check
@@ -129,7 +129,7 @@ jobs:
       with:
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cloudformation-deploy-role
         role-session-name: DeployInfra
-        aws-region: us-east-2
+        aws-region: "${{ secrets.AWS_REGION }}"
 
     - name: Retrieve default VPC ID and public subnets
       id: vpc
