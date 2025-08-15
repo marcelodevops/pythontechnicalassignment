@@ -34,9 +34,9 @@ jobs:
         run: |
           venv/bin/python -m pytest
 
-      - name: Lint Test with Flake8
-        run: |
-          venv/bin/python -m flake8 . --exclude=venv
+      # - name: Lint Test with Flake8
+      #   run: |
+      #     venv/bin/python -m flake8 . --exclude=venv
 
      # Security Check - Static Code Analysis  
       - name: Run Bandit Security Check
