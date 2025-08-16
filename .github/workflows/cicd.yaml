@@ -124,7 +124,7 @@ jobs:
         --template-file cloudformation-templates/setup.yaml \
         --capabilities CAPABILITY_NAMED_IAM \
         --region ${{ secrets.AWS_REGION }} \
-        --parameter-overrides GitHubOrg=full2cloud RepositoryName=${{ github.repository }} OIDCProviderArn=arn:aws:iam::088544155050:oidc-provider/token.actions.githubusercontent.com
+        --parameter-overrides GitHubOrg=full2cloud RepositoryName=${{ github.repository }} 
 
   deploy-infrastructure:
     needs: setup-GHactions-oidc
