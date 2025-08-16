@@ -144,14 +144,14 @@ jobs:
     # and is derived from the GitHub repository name.
     # For example, the repo 'Octocat/Hello-World' would have the environment name
     # 'Octocat-Hello-World' and would deploy a stack name 'Octocat-Hello-World-ecr-repo'.
-    - name: Configure environment name
-      id: env-name
-      env:
-        REPO: ${{ github.repository }}
-      run: |
-        ENVIRONMENT=`echo $REPO | tr "/" "-"`
-        echo "Environment name: $ENVIRONMENT"
-        echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+    # - name: Configure environment name
+    #   id: env-name
+    #   env:
+    #     REPO: ${{ github.repository }}
+    #   run: |
+    #     ENVIRONMENT=`echo $REPO | tr "/" "-"`
+    #     echo "Environment name: $ENVIRONMENT"
+    #     echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
 
     - name: Configure AWS credentials
       id: creds
