@@ -110,6 +110,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
     # The "environment name" is used as the base for CloudFormation stack names,
     # and is derived from the GitHub repository name.
     # For example, the repo 'Octocat/Hello-World' would have the environment name
@@ -123,13 +130,13 @@ jobs:
         echo "Environment name: $ENVIRONMENT"
         echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
 
-    - name: Configure AWS credentials
-      id: creds
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cloudformation-deploy-role
-        role-session-name: DeployInfra
-        aws-region: "${{ secrets.AWS_REGION }}"
+    # - name: Configure AWS credentials
+    #   id: creds
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cloudformation-deploy-role
+    #     role-session-name: DeployInfra
+    #     aws-region: "${{ secrets.AWS_REGION }}"
 
     - name: Retrieve default VPC ID and public subnets
       id: vpc
