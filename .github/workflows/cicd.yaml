@@ -121,13 +121,13 @@ jobs:
       run: |
         aws cloudformation deploy \
         --stack-name github-actions-cloudformation-deploy-setup \
-        --template-file cloudformation-templates/setup.yml \
+        --template-file cloudformation-templates/setup.yaml \
         --capabilities CAPABILITY_NAMED_IAM \
-        --region us-east-2 \
+        --region ${{ secrets.AWS_REGION }} \
         --parameter-overrides GitHubOrg=full2cloud RepositoryName=${{ github.repository }}
 
   deploy-infrastructure:
-    needs: build_and_push_docker_image
+    needs: setup-GHactions-oidc
     name: Deploy infrastructure
     runs-on: ubuntu-latest
     permissions:
