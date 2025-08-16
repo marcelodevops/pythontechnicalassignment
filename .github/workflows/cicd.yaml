@@ -101,9 +101,9 @@ jobs:
     needs: build_and_push_docker_image
     name: Setup github actions OIDC
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write
-    #   contents: read
+    permissions:
+      id-token: write
+      contents: read
     # outputs:
     #   env-name: ${{ steps.env-name.outputs.environment }}
     steps:
@@ -117,7 +117,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Push Docker image to ECR
+    - name: Deploy cloudformation setup template
       run: |
         aws cloudformation deploy \
         --stack-name github-actions-cloudformation-deploy-setup \
