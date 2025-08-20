@@ -190,7 +190,7 @@ jobs:
       id: service-stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
-        name: ${{ needs.deploy-infrastructure.outputs.env-name }}-webapp
+        name: marcelodevops-pythontechnicalassignment-webapp
         template: cloudformation-templates/service.yaml
         role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
 
