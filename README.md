@@ -2,7 +2,7 @@
 
 ---
 
-# Technical assignment: You are tasked with creaGng a simplified cloud-based applicaGon deployment pipeline using GitHub AcGons and AWS services.
+## Technical assignment: You are tasked with creaGng a simplified cloud-based application deployment pipeline using GitHub Actions and AWS services.
 
 
   
@@ -11,12 +11,12 @@ I developed a CI/CD pipeline for a containerized Python application using GitHub
 
 ### Requirements
 - You will create a basic Python REST API and deploy it to AWS using a CI/CD pipeline.
-- The REST API shall have at least two endpoints, one for checking the applicaGon health and one
-to retrieve (dummy) data and shall require authenGcaGon.
-- The applicaGon should be containerized using Docker. Please use the AWS Free Tier, and GitHub
+- The REST API shall have at least two endpoints, one for checking the application health and one
+to retrieve (dummy) data and shall require authentication.
+- The application should be containerized using Docker. Please use the AWS Free Tier, and GitHub
 repositories as applicable.
-- Please use AWS CDK or CloudFormaGon to define the infrastructure.
-- Write tests where relevant and follow market standard pracGces.
+- Please use AWS CDK or CloudFormation to define the infrastructure.
+- Write tests where relevant and follow market standard practices.
 - Ensure to document the code and your approach to the soluGon.
 
 ### Acceptance Criteria
