@@ -7,7 +7,6 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 import os
 import subprocess
-import jwt
 
 
 app = Flask(__name__)
