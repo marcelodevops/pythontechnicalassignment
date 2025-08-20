@@ -186,7 +186,6 @@ jobs:
           VPC=${{ steps.vpc.outputs.vpc-id }},
           PublicSubnetOne=${{ steps.vpc.outputs.subnet-one }},
           PublicSubnetTwo=${{ steps.vpc.outputs.subnet-two }}
-          
     - name: Deploy ECS service with CloudFormation
       id: service-stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
