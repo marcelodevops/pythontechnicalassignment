@@ -97,9 +97,9 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest
           echo "image=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest" >> "$GITHUB_OUTPUT"
 
-  setup-GHactions-oidc:
+  setup_roles:
     needs: build_and_push_docker_image
-    name: Setup github actions OIDC
+    name: Setup roles
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -127,7 +127,7 @@ jobs:
         --parameter-overrides GitHubOrg=full2cloud RepositoryName=${{ github.repository }} 
 
   deploy-infrastructure:
-    needs: setup-GHactions-oidc
+    needs: setup_roles
     name: Deploy infrastructure
     runs-on: ubuntu-latest
     permissions:
@@ -157,9 +157,9 @@ jobs:
       id: creds
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cloudformation-deploy-role
-        role-session-name: DeployInfra
-        aws-region: "${{ secrets.AWS_REGION }}"
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Retrieve default VPC ID and public subnets
       id: vpc
