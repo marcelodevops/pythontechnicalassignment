@@ -2,7 +2,7 @@
 
 ---
 
-## Technical assignment: You are tasked with creaGng a simplified cloud-based application deployment pipeline using GitHub Actions and AWS services.
+## Technical assignment: You are tasked with creating a simplified cloud-based application deployment pipeline using GitHub Actions and AWS services.
 
 
   
