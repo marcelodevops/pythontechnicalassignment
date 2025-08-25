@@ -24,7 +24,10 @@ class FlaskAppTests(unittest.TestCase):
         self.assertEqual(json_data['description'], "marcelo's merck technical test.")
         self.assertEqual(json_data['version'], "1.0")
         self.assertIsInstance(json_data['last_commit_sha'], str)  # it's a string
-    
+   
+    @unittest.skip('Work in progress')
+    def test_token_required(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
