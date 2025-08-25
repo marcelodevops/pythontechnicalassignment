@@ -17,7 +17,7 @@ APP_VERSION = "1.0"
 APP_DESCRIPTION = "marcelo's merck technical test."
 
 @app.route('/private')
-@token_required
+@token_required # type: ignore
 def auth():
    return 'JWT is verified. Welcome to your private page!'
 
