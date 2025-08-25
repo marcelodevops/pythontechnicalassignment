@@ -7,13 +7,16 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 import os
 import subprocess
-import jwt
+from flask_jwt_extended import JWTManager,create_acess_token,jwt_required,get_jwt_identity
+import json
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+JWT_SECRET = os.environ.get('JWT_SECRET')
+jwt = JWTManager(app)
 
-
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 APP_VERSION = "1.0"
 APP_DESCRIPTION = "marcelo's merck technical test."
 
