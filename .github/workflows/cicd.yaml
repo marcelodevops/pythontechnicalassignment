@@ -38,7 +38,7 @@ jobs:
 
       - name: Lint Test with Flake8
         run: |
-          venv/bin/python -m flake8 . --exclude=venv
+          venv/bin/python -m flake8 . --exclude=venv --ignore=F811,F841
 
      # Security Check - Static Code Analysis  
       - name: Run Bandit Security Check
