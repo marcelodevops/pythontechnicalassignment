@@ -21,6 +21,8 @@ APP_DESCRIPTION = "marcelo's merck technical test."
 def auth():
    return 'JWT is verified. Welcome to your private page!'
 
+
+@unittest.skip('Work in progress')
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
