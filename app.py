@@ -1,6 +1,6 @@
 # app.py
 from flask import (
-    Flask, render_template, redirect, url_for, flash, jsonify, make_response, session, flash, request
+    Flask, render_template, redirect, url_for, flash, jsonify, flash, request
 )
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
@@ -16,7 +16,6 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 
 APP_VERSION = "1.0"
 APP_DESCRIPTION = "marcelo's merck technical test."
-
 
 
 def token_required(func):
@@ -35,10 +34,12 @@ def token_required(func):
 
     return decorated
 
+
 @app.route('/private')
-@token_required # type: ignore
+@token_required 
 def auth():
-   return 'JWT is verified. Welcome to your private page!'
+  return 'JWT is verified. Welcome to your private page!'
+
 
 # get last commit sha to show it in the healthcheck endpoint
 def get_last_commit_sha():
