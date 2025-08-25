@@ -16,10 +16,7 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 APP_VERSION = "1.0"
 APP_DESCRIPTION = "marcelo's merck technical test."
 
-@app.route('/private')
-@token_required # type: ignore
-def auth():
-   return 'JWT is verified. Welcome to your private page!'
+
 
 def token_required(func):
     @wraps(func)
@@ -36,6 +33,11 @@ def token_required(func):
         return func(*args, **kwargs)
 
     return decorated
+
+@app.route('/private')
+@token_required # type: ignore
+def auth():
+   return 'JWT is verified. Welcome to your private page!'
 
 # get last commit sha to show it in the healthcheck endpoint
 def get_last_commit_sha():
