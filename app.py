@@ -36,9 +36,9 @@ def token_required(func):
 
 
 @app.route('/private')
-@token_required 
+@token_required
 def auth():
-  return 'JWT is verified. Welcome to your private page!'
+    return 'JWT is verified. Welcome to your private page!'
 
 
 # get last commit sha to show it in the healthcheck endpoint
