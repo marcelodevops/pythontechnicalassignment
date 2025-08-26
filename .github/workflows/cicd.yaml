@@ -87,7 +87,7 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          docker build --build-arg FLASK_SECRET_KEY=${{ secrets.FLASK_SECRET_KEY }} -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest .
+          docker build --build-arg FLASK_SECRET_KEY=123123123456 -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest .
     
       # Security Check - Container Vulnerability Scan
       - name: Run Trivy Image Scan
