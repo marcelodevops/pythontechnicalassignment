@@ -11,7 +11,7 @@ import subprocess
 import jwt
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
 
 
 APP_VERSION = "1.0"
