@@ -4,7 +4,6 @@
 
 ## Technical assignment: You are tasked with creating a simplified cloud-based application deployment pipeline using GitHub Actions and AWS services.
 
-
   
 ### Description
 I developed a CI/CD pipeline for a containerized Python application using GitHub Actions, Docker, AWS ECR, AWS ECS, AWS Cloudformation. 
