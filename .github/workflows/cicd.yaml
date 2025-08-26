@@ -55,7 +55,8 @@ jobs:
   build_and_push_docker_image:
     needs: build_and_test
     runs-on: ubuntu-latest
-
+    env: 
+      FLASK_SECRET_KEY: ${{ secrets.FLASK_SECRET_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -86,7 +87,7 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest .
+          docker build --build-arg FLASK_SECRET_KEY=$FLASK_SECRET_KEY -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:latest .
     
       # Security Check - Container Vulnerability Scan
       - name: Run Trivy Image Scan

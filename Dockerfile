@@ -4,7 +4,7 @@ FROM python:3.11-slim AS base
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
+ENV FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
 # Install git
 RUN apt-get update && \
     apt-get install -y git && \
@@ -16,7 +16,7 @@ WORKDIR /app
 
 # Copy the requirements file and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN FLASK_SECRET_KEY=$FLASK_SECRET_KEY pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
@@ -25,13 +25,13 @@ COPY . .
 COPY .git .git
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 3001
 
 # Build stage for testing
 FROM base AS test
 
 # Run unit tests
-RUN python -m unittest discover -s tests
+RUN FLASK_SECRET_KEY=$FLASK_SECRET_KEY python -m unittest discover -s tests
 
 # Final stage
 FROM base AS final
