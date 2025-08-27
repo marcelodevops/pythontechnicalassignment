@@ -219,7 +219,7 @@ jobs:
       id: cluster-stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1.3.0
       with:
-        name: ${{ steps.env-name.outputs.environment }}-infra
+        name: ${{ steps.env-name.outputs.environment }}-eks-cluster
         template: cloudformation-templates/eks.yaml
  #       role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
         no-fail-on-empty-changeset: "1"
