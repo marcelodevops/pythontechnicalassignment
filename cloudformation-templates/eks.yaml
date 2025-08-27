@@ -1,0 +1,87 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Amazon EKS - Cluster'
+
+Parameters:
+  EksVersion:
+    Type: String
+    Default: '1.30'
+  EnvironmentName:
+    Type: String
+    Default: 'marcelodevops-pythontechnicalassignment'
+    Description: The name of the environment to add this load balancer to
+  EksRoleArn:
+    Type: String
+    Default: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
+    Description: Role arn that allows the cluster Kubernetes control plane to manage AWS resources on your behalf.
+  VPC:
+    Description: VPC ID
+    Type: AWS::EC2::VPC::Id
+  PublicSubnetOne:
+    Description: Subnet ID
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnetTwo:
+    Description: Subnet ID
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnetOne:
+    Description: Subnet ID
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnetTwo:
+    Description: Subnet ID
+    Type: AWS::EC2::Subnet::Id
+
+
+Resources:
+  myCluster:
+    Type: 'AWS::EKS::Cluster'
+    Properties:
+      Name: eks-demo
+      Version: !Ref EksVersion
+      RoleArn: !Ref EksRoleArn
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - !GetAtt EKSClusterSecurityGroup.GroupId
+        SubnetIds:
+          - subnet-038f833c7fcb826b2
+          - subnet-07e983a592e33d5b8
+          - subnet-08b347f4cb5083731
+          - subnet-0de7b557f24bf5d06
+          
+  EKSClusterInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref EKSClusterInstanceRole
+
+  EKSClusterInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - eks.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      RoleName: !Join [ "-", [ !Ref 'AWS::StackName', "EKS-Cluster-Role" ] ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+
+  EKSClusterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group EKS Cluster
+      GroupName: !Join [ "", [ !Ref 'AWS::StackName', "-EKS-Cluster-Security-Group" ] ]
+      VpcId:
+        !Ref VpcId
+      Tags:
+      - Key: !Sub "kubernetes.io/cluster/${AWS::StackName}-EKS-Cluster"
+        Value: 'owned'
+      - Key: 'Name'
+        Value: !Join [ "", [ !Ref 'AWS::StackName', "-EKS-Cluster-Security-Group" ] ]

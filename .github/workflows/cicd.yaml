@@ -183,6 +183,24 @@ jobs:
         SUBNET_2=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=default-for-az,Values=true" --query 'Subnets[1].SubnetId' --output text`
         echo "subnet-two=$SUBNET_2" >> "$GITHUB_OUTPUT"
 
+    - name: Retrieve cluster VPC ID and subnets. 
+      id: cluster-vpc
+      run: |
+        CLUSTER_VPC_ID=`aws ec2 describe-vpcs --filters "Name=isDefault, Values=false" --query 'Vpcs[].VpcId' --output text`
+        echo "cluster-vpc-id=$CLUSTER_VPC_ID" >> "$GITHUB_OUTPUT"
+
+        SUBNET_PUB_1=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$CLUSTER_VPC_ID"  "Name=map-public-ip-on-launch, Values=true" --query 'Subnets[0].SubnetId' --output text`
+        echo "subnet-pub-one=$SUBNET_PUB_1" >> "$GITHUB_OUTPUT"
+
+        SUBNET_PUB_2=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$CLUSTER_VPC_ID" "Name=map-public-ip-on-launch, Values=true"  --query 'Subnets[1].SubnetId' --output text`
+        echo "subnet-pub-two=$SUBNET_PUB_2" >> "$GITHUB_OUTPUT" 
+
+        SUBNET_PRIV_1=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$CLUSTER_VPC_ID" "Name=map-public-ip-on-launch, Values=false"  --query 'Subnets[0].SubnetId' --output text`
+        echo "subnet-priv-one=$SUBNET_PRIV_1" >> "$GITHUB_OUTPUT" 
+        
+        SUBNET_PRIV_2=`aws ec2 describe-subnets --filters "Name=vpc-id,Values=$CLUSTER_VPC_ID" "Name=map-public-ip-on-launch, Values=false"  --query 'Subnets[1].SubnetId' --output text`
+        echo "subnet-priv-two=$SUBNET_PRIV_2" >> "$GITHUB_OUTPUT" 
+
     - name: Deploy infrastructure with CloudFormation
       id: infrastructure-stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
@@ -196,17 +214,35 @@ jobs:
           VPC=${{ steps.vpc.outputs.vpc-id }},
           PublicSubnetOne=${{ steps.vpc.outputs.subnet-one }},
           PublicSubnetTwo=${{ steps.vpc.outputs.subnet-two }}
-    - name: Deploy ECS service with CloudFormation
-      id: service-stack
-      uses: aws-actions/aws-cloudformation-github-deploy@v1
+
+    - name: Deploy EKS cluster with CloudFormation
+      id: cluster-stack
+      uses: aws-actions/aws-cloudformation-github-deploy@v1.3.0
       with:
-        name: marcelodevops-pythontechnicalassignment-webapp
-        template: cloudformation-templates/service.yaml
-        role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
+        name: ${{ steps.env-name.outputs.environment }}-infra
+        template: cloudformation-templates/eks.yaml
+        role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
+        no-fail-on-empty-changeset: "1"
+        parameter-overrides: >-
+          EnvironmentName=${{ steps.env-name.outputs.environment }},
+          VPC=${{ steps.cluster-vpc.outputs.vpc-id }},
+          PublicSubnetOne=${{ steps.cluster-vpc.outputs.subnet-pub-one }},
+          PublicSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-pub-two }},
+          PrivateSubnetOne=${{ steps.cluster-vpc.outputs.subnet-priv-one }},
+          PrivateSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-priv-two }}
+    # - name: Deploy ECS service with CloudFormation
+    # - name: Deploy ECS service with CloudFormation
+    #   id: service-stack
+    #   uses: aws-actions/aws-cloudformation-github-deploy@v1
+    #   with:
+    #     name: marcelodevops-pythontechnicalassignment-webapp
+    #     no-fail-on-empty-changeset: "1"
+    #     template: cloudformation-templates/service.yaml
+    #     role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
 
 
-    - name: Print service URL
-      env:
-        URL: ${{ steps.service-stack.outputs.ServiceURL }}
-      run: |
-        echo "Service URL: $URL"
+    # - name: Print service URL
+    #   env:
+    #     URL: ${{ steps.service-stack.outputs.ServiceURL }}
+    #   run: |
+    #     echo "Service URL: $URL"
