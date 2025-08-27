@@ -10,10 +10,10 @@ Parameters:
     Type: String
     Default: 'marcelodevops-pythontechnicalassignment'
     Description: The name of the environment to add this load balancer to
-  EksRoleArn:
-    Type: String
-    Default: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
-    Description: Role arn that allows the cluster Kubernetes control plane to manage AWS resources on your behalf.
+  # EksRoleArn:
+  #   Type: String
+  #   Default: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
+  #   Description: Role arn that allows the cluster Kubernetes control plane to manage AWS resources on your behalf.
   VPC:
     Description: VPC ID
     Type: AWS::EC2::VPC::Id
