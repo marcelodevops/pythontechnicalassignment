@@ -221,7 +221,7 @@ jobs:
       with:
         name: ${{ steps.env-name.outputs.environment }}-infra
         template: cloudformation-templates/eks.yaml
-        role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
+ #       role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
         no-fail-on-empty-changeset: "1"
         parameter-overrides: >-
           EnvironmentName=${{ steps.env-name.outputs.environment }},

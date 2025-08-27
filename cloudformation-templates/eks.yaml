@@ -37,15 +37,15 @@ Resources:
     Properties:
       Name: eks-demo
       Version: !Ref EksVersion
-      RoleArn: !Ref EksRoleArn
+      RoleArn: !Ref EKSClusterInstanceRole
       ResourcesVpcConfig:
         SecurityGroupIds:
           - !GetAtt EKSClusterSecurityGroup.GroupId
         SubnetIds:
-          - subnet-038f833c7fcb826b2
-          - subnet-07e983a592e33d5b8
-          - subnet-08b347f4cb5083731
-          - subnet-0de7b557f24bf5d06
+          - !Ref PublicSubnetOne
+          - !Ref PublicSubnetTwo
+          - !Ref PrivateSubnetOne
+          - !Ref PrivateSubnetTwo
           
   EKSClusterInstanceProfile:
     Type: AWS::IAM::InstanceProfile
