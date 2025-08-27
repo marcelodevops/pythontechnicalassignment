@@ -226,7 +226,7 @@ jobs:
         capabilities: 'CAPABILITY_NAMED_IAM'
         parameter-overrides: >-
           EnvironmentName=${{ steps.env-name.outputs.environment }},
-          VPC=${{ steps.cluster-vpc.outputs.vpc-id }},
+          VPC=${{ steps.cluster-vpc.outputs.cluster-vpc-id }},
           PublicSubnetOne=${{ steps.cluster-vpc.outputs.subnet-pub-one }},
           PublicSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-pub-two }},
           PrivateSubnetOne=${{ steps.cluster-vpc.outputs.subnet-priv-one }},
