@@ -223,6 +223,7 @@ jobs:
         template: cloudformation-templates/eks.yaml
  #       role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
         no-fail-on-empty-changeset: "1"
+        capabilities: 'CAPABILITY_NAMED_IAM'
         parameter-overrides: >-
           EnvironmentName=${{ steps.env-name.outputs.environment }},
           VPC=${{ steps.cluster-vpc.outputs.vpc-id }},
