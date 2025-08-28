@@ -1,7 +1,15 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: merck-test
+  labels:
+    name: merck
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: merck-app-deployment
+  namespace: merck-test
   labels:
     app: merck-app
     environment: "dev"  # Default value, can be set in the pipeline
