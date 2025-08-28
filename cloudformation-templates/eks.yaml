@@ -37,7 +37,7 @@ Resources:
     Properties:
       Name: eks-demo
       Version: !Ref EksVersion
-      RoleArn: !Ref EKSClusterInstanceRole
+      RoleArn: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
       ResourcesVpcConfig:
         SecurityGroupIds:
           - !GetAtt EKSClusterSecurityGroup.GroupId
@@ -47,31 +47,31 @@ Resources:
           - !Ref PrivateSubnetOne
           - !Ref PrivateSubnetTwo
           
-  EKSClusterInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: "/"
-      Roles:
-      - !Ref EKSClusterInstanceRole
+  # EKSClusterInstanceProfile:
+  #   Type: AWS::IAM::InstanceProfile
+  #   Properties:
+  #     Path: "/"
+  #     Roles:
+  #     - !Ref EKSClusterInstanceRole
 
-  EKSClusterInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - eks.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"
-      RoleName: !Join [ "-", [ 'merck', "EKS-Cluster-Role" ] ]
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
-        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
-        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+  # EKSClusterInstanceRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service:
+  #           - eks.amazonaws.com
+  #         Action:
+  #         - sts:AssumeRole
+  #     Path: "/"
+  #     RoleName: !Join [ "-", [ 'merck', "EKS-Cluster-Role" ] ]
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+  #       - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+  #       - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
 
   EKSClusterSecurityGroup:
     Type: AWS::EC2::SecurityGroup
