@@ -99,7 +99,7 @@ Parameters:
 
   Subnets:
     Type: "List<AWS::EC2::Subnet::Id>"
-    Default: subnet-089cec5f086d93822,subnet-02f0ff40069e2de90
+    Default: subnet-0d318103c63bdd977,subnet-0632f63ebc43c5008
     Description: The subnets where workers can be created.
 
   VpcId:
