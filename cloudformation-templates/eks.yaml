@@ -49,12 +49,12 @@ Resources:
 
           
   EKSPodIdentityAssociation:
-  Type: AWS::EKS::PodIdentityAssociation
-  Properties:
-    ClusterName: eks-demo
-    Namespace: "merck-test"  # ← Change this
-    ServiceAccount: "default"  # ← Change this
-    RoleArn: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
+    Type: AWS::EKS::PodIdentityAssociation
+    Properties:
+      ClusterName: eks-demo
+      Namespace: "merck-test"  # ← Change this
+      ServiceAccount: "default"  # ← Change this
+      RoleArn: 'arn:aws:iam::088544155050:role/Eks-cluster-role'
   # EKSClusterInstanceProfile:
   #   Type: AWS::IAM::InstanceProfile
   #   Properties:
