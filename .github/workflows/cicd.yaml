@@ -221,7 +221,6 @@ jobs:
       with:
         name: ${{ steps.env-name.outputs.environment }}-eks-cluster
         template: cloudformation-templates/eks.yaml
- #       role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/Eks-cluster-role
         no-fail-on-empty-changeset: "1"
         capabilities: 'CAPABILITY_NAMED_IAM'
         parameter-overrides: >-
@@ -231,19 +230,109 @@ jobs:
           PublicSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-pub-two }},
           PrivateSubnetOne=${{ steps.cluster-vpc.outputs.subnet-priv-one }},
           PrivateSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-priv-two }}
-    # - name: Deploy ECS service with CloudFormation
-    # - name: Deploy ECS service with CloudFormation
-    #   id: service-stack
-    #   uses: aws-actions/aws-cloudformation-github-deploy@v1
-    #   with:
-    #     name: marcelodevops-pythontechnicalassignment-webapp
-    #     no-fail-on-empty-changeset: "1"
-    #     template: cloudformation-templates/service.yaml
-    #     role-arn: arn:aws:iam::${{ steps.creds.outputs.aws-account-id }}:role/github-actions-cloudformation-stack-role
+
+    - name: Deploy worker nodes
+      id: worker-nodes
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: ${{ steps.env-name.outputs.environment }}-nodes
+        no-fail-on-empty-changeset: "1"
+        capabilities: 'CAPABILITY_NAMED_IAM'
+        template: cloudformation-templates/worker-nodes.yaml
+        # parameter-overrides: >-
+        #   EnvironmentName=${{ steps.env-name.outputs.environment }},
+        #   VpcId=${{ steps.cluster-vpc.outputs.cluster-vpc-id }},
+        #   Subnets=${{ steps.cluster-vpc.outputs.subnet-priv-one }},${{ steps.cluster-vpc.outputs.subnet-priv-two }}
 
 
-    # - name: Print service URL
-    #   env:
-    #     URL: ${{ steps.service-stack.outputs.ServiceURL }}
-    #   run: |
-    #     echo "Service URL: $URL"
+ 
+  # deploy_k8s:
+  #   needs: build_and_push_docker_image
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ secrets.AWS_REGION }}
+
+  #     - name: Get Last Commit SHA
+  #       id: get_last_commit
+  #       run: echo "LAST_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+
+  #     - name: Install jq
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y jq
+
+  #     - name: Install kubectl
+  #       run: |
+  #         curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+  #         chmod +x ./kubectl
+  #         sudo mv ./kubectl /usr/local/bin/kubectl
+
+  #     - name: Check kubectl version
+  #       run: kubectl version --client
+
+  #     - name: Update Kubeconfig for EKS Cluster
+  #       run: |
+  #         if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+  #           CLUSTER_NAME=eks-cluster-prod
+  #         else
+  #           CLUSTER_NAME=eks-cluster-dev
+  #         fi
+  #         aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+
+  #     - name: Make update-k8s-yaml.sh executable
+  #       env:
+  #         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  #         ECR_REGION: ${{ secrets.AWS_REGION }}
+  #       run: chmod +x ./kubernetes/update-k8s-yaml.sh
+
+  #     - name: Update Kubernetes Deployment YAML
+  #       env:
+  #         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  #         ECR_REGION: ${{ secrets.AWS_REGION }}
+  #       run: ./kubernetes/update-k8s-yaml.sh 
+
+  #     - name: Deploy to Kubernetes
+  #       run: |
+  #         kubectl apply -f ./kubernetes/deployment.yaml
+
+  #     - name: Create ImagePullSecret
+  #       run: |
+  #         kubectl get secret merck-secret || \
+  #         kubectl create secret docker-registry merck-secret \
+  #          --docker-server=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com \
+  #          --docker-username=AWS \
+  #          --docker-password=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }}) \
+  #          --docker-email=${{ secrets.MY_AWS_EMAIL }}
+
+  #     - name: Deploy to Service Kubernetes
+  #       run: |
+  #         kubectl apply -f ./kubernetes/service.yaml
+
+  #     - name: Get Kubernetes Pods
+  #       run: |
+  #         echo "Getting Kubernetes pods..."
+  #         kubectl get pods -o wide
+
+  #     - name: Get Kubernetes Service
+  #       run: |
+  #         echo "Getting Kubernetes service..."
+  #         kubectl get svc
+
+  #     - name: Describe Kubernetes Pods
+  #       run: |
+  #         echo "Describing Kubernetes pods..."
+  #         kubectl describe pods
+
+  #     - name: Get Kubernetes Nodes
+  #       run: |
+  #         echo "Getting Kubernetes nodes..."
+  #         kubectl get nodes -o wide
