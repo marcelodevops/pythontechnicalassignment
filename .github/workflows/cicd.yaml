@@ -246,38 +246,38 @@ jobs:
 
 
  
-  # deploy_k8s:
-  #   needs: build_and_push_docker_image
-  #   runs-on: ubuntu-latest
+  deploy_k8s:
+    needs: deploy-infrastructure
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  #     - name: Set up AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v2
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-  #     - name: Get Last Commit SHA
-  #       id: get_last_commit
-  #       run: echo "LAST_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Get Last Commit SHA
+        id: get_last_commit
+        run: echo "LAST_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
 
-  #     - name: Install jq
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y jq
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
 
-  #     - name: Install kubectl
-  #       run: |
-  #         curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-  #         chmod +x ./kubectl
-  #         sudo mv ./kubectl /usr/local/bin/kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
 
-  #     - name: Check kubectl version
-  #       run: kubectl version --client
+      - name: Check kubectl version
+        run: kubectl version --client
 
   #     - name: Update Kubeconfig for EKS Cluster
   #       run: |
