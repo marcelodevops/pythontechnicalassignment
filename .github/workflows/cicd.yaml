@@ -279,30 +279,30 @@ jobs:
       - name: Check kubectl version
         run: kubectl version --client
 
-  #     - name: Update Kubeconfig for EKS Cluster
-  #       run: |
-  #         if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-  #           CLUSTER_NAME=eks-cluster-prod
-  #         else
-  #           CLUSTER_NAME=eks-cluster-dev
-  #         fi
-  #         aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+      - name: Update Kubeconfig for EKS Cluster
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            CLUSTER_NAME=eks-demo
+          else
+            CLUSTER_NAME=eks-demo
+          fi
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
 
-  #     - name: Make update-k8s-yaml.sh executable
-  #       env:
-  #         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  #         ECR_REGION: ${{ secrets.AWS_REGION }}
-  #       run: chmod +x ./kubernetes/update-k8s-yaml.sh
+      - name: Make update-k8s-yaml.sh executable
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_REGION: ${{ secrets.AWS_REGION }}
+        run: chmod +x ./kubernetes/update-k8s-yaml.sh
 
-  #     - name: Update Kubernetes Deployment YAML
-  #       env:
-  #         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  #         ECR_REGION: ${{ secrets.AWS_REGION }}
-  #       run: ./kubernetes/update-k8s-yaml.sh 
+      - name: Update Kubernetes Deployment YAML
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_REGION: ${{ secrets.AWS_REGION }}
+        run: ./kubernetes/update-k8s-yaml.sh 
 
-  #     - name: Deploy to Kubernetes
-  #       run: |
-  #         kubectl apply -f ./kubernetes/deployment.yaml
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f ./kubernetes/deployment.yaml
 
   #     - name: Create ImagePullSecret
   #       run: |
