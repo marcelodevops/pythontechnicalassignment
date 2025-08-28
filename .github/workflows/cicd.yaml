@@ -304,35 +304,35 @@ jobs:
         run: |
           kubectl apply -f ./kubernetes/deployment.yaml
 
-  #     - name: Create ImagePullSecret
-  #       run: |
-  #         kubectl get secret merck-secret || \
-  #         kubectl create secret docker-registry merck-secret \
-  #          --docker-server=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com \
-  #          --docker-username=AWS \
-  #          --docker-password=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }}) \
-  #          --docker-email=${{ secrets.MY_AWS_EMAIL }}
+      - name: Create ImagePullSecret
+        run: |
+          kubectl get secret merck-secret || \
+          kubectl create secret docker-registry merck-secret \
+           --docker-server=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com \
+           --docker-username=AWS \
+           --docker-password=$(aws ecr get-login-password --region ${{ secrets.AWS_REGION }}) \
+           --docker-email=${{ secrets.MY_AWS_EMAIL }}
 
-  #     - name: Deploy to Service Kubernetes
-  #       run: |
-  #         kubectl apply -f ./kubernetes/service.yaml
+      - name: Deploy to Service Kubernetes
+        run: |
+          kubectl apply -f ./kubernetes/service.yaml
 
-  #     - name: Get Kubernetes Pods
-  #       run: |
-  #         echo "Getting Kubernetes pods..."
-  #         kubectl get pods -o wide
+      - name: Get Kubernetes Pods
+        run: |
+          echo "Getting Kubernetes pods..."
+          kubectl get pods -o wide
 
-  #     - name: Get Kubernetes Service
-  #       run: |
-  #         echo "Getting Kubernetes service..."
-  #         kubectl get svc
+      - name: Get Kubernetes Service
+        run: |
+          echo "Getting Kubernetes service..."
+          kubectl get svc
 
-  #     - name: Describe Kubernetes Pods
-  #       run: |
-  #         echo "Describing Kubernetes pods..."
-  #         kubectl describe pods
+      - name: Describe Kubernetes Pods
+        run: |
+          echo "Describing Kubernetes pods..."
+          kubectl describe pods
 
-  #     - name: Get Kubernetes Nodes
-  #       run: |
-  #         echo "Getting Kubernetes nodes..."
-  #         kubectl get nodes -o wide
+      - name: Get Kubernetes Nodes
+        run: |
+          echo "Getting Kubernetes nodes..."
+          kubectl get nodes -o wide
