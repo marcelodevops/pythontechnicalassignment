@@ -231,14 +231,14 @@ jobs:
           PrivateSubnetOne=${{ steps.cluster-vpc.outputs.subnet-priv-one }},
           PrivateSubnetTwo=${{ steps.cluster-vpc.outputs.subnet-priv-two }}
 
-    - name: Deploy worker nodes
-      id: worker-nodes
-      uses: aws-actions/aws-cloudformation-github-deploy@v1
-      with:
-        name: ${{ steps.env-name.outputs.environment }}-nodes
-        no-fail-on-empty-changeset: "1"
-        capabilities: 'CAPABILITY_NAMED_IAM'
-        template: cloudformation-templates/worker-nodes.yaml
+    # - name: Deploy worker nodes
+    #   id: worker-nodes
+    #   uses: aws-actions/aws-cloudformation-github-deploy@v1
+    #   with:
+    #     name: ${{ steps.env-name.outputs.environment }}-nodes
+    #     no-fail-on-empty-changeset: "1"
+    #     capabilities: 'CAPABILITY_NAMED_IAM'
+    #     template: cloudformation-templates/worker-nodes.yaml
         # parameter-overrides: >-
         #   EnvironmentName=${{ steps.env-name.outputs.environment }},
         #   VpcId=${{ steps.cluster-vpc.outputs.cluster-vpc-id }},

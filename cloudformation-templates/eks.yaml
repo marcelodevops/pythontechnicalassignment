@@ -3,6 +3,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon EKS - Cluster'
 
 Parameters:
+  EksCluster:
+    Type: String
+    Default: 'eks-demo'
   EksVersion:
     Type: String
     Default: '1.30'
@@ -29,6 +32,9 @@ Parameters:
   PrivateSubnetTwo:
     Description: Subnet ID
     Type: AWS::EC2::Subnet::Id
+  KeyName:
+    Type: 'String'
+    Default: 'eks-node'
 
 
 Resources:
@@ -93,3 +99,40 @@ Resources:
         Value: 'owned'
       - Key: 'Name'
         Value: !Join [ "", [ 'merck', "-EKS-Cluster-Security-Group" ] ]
+
+  InstanceSecurityGroup:
+  Type: AWS::EC2::SecurityGroup
+  Properties:
+    GroupDescription: Allow http to client host
+    VpcId: !Ref myVPC
+    SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+    SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+  
+  EksNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !Ref EksCluster
+      NodegroupName: !Sub "merck-eks-node-group"
+      NodeRole: 'arn:aws:iam::088544155050:role/AmazonEKSNodeRole'
+      Subnets: 
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+        # Add as many subnets as needed
+      ScalingConfig:
+        DesiredSize: 2
+        MaxSize: 3
+        MinSize: 1
+      InstanceTypes:
+        - t3.small
+      RemoteAccess:
+        Ec2SshKey: !Ref KeyName
+        SourceSecurityGroups:
+          - !Ref InstanceSecurityGroup
