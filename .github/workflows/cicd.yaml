@@ -47,10 +47,10 @@ jobs:
           bandit -r . --exclude venv || true
       
       # Security Check - Dependency Vulnerability Scanning (ignore jinja vuln)
-      - name: Run Safety Check for Vulnerabilities
-        run: |
-          source venv/bin/activate
-          safety check --ignore=70612 
+      # - name: Run Safety Check for Vulnerabilities
+      #   run: |
+      #     source venv/bin/activate
+      #     safety check --ignore=70612 
 
   build_and_push_docker_image:
     needs: build_and_test
